@@ -1,0 +1,70 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version "$springBootVersion"
+	id 'io.spring.dependency-management' version "$springDependenctManagementVersion"
+	id 'org.liquibase.gradle' version "$liquibaseGradle"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.session:spring-session-core'
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+	implementation "io.asyncer:r2dbc-mysql:$r2dbcMySqlVersion"
+	implementation "mysql:mysql-connector-java:$mysqlConnectorVersion"
+
+
+	implementation "org.liquibase:liquibase-core:$liquibaseCoreVersion"
+	implementation "org.mapstruct:mapstruct:$mupstructVersion"
+	implementation "com.google.code.findbugs:jsr305:$googleFindBugsVersion"
+	implementation "io.jsonwebtoken:jjwt:$jsonwebtokenVersion"
+	implementation "javax.xml.bind:jaxb-api:$jaxbApiVersion"
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mupstructVersion"
+	compileOnly 'org.projectlombok:lombok'
+}
+
+apply plugin: "org.liquibase.gradle"
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+liquibase {
+	activities {
+		main {
+			changeLogFile "/src/main/resources/db/changelog/master.xml"
+			url "jdbc:mysql://localhost:3306/akatunyan_jdbc"
+			username "root"
+			password "241663"
+
+		}
+	}
+
+
+	tasks.named('bootBuildImage') {
+		builder = 'paketobuildpacks/builder-jammy-base:latest'
+	}
+}
