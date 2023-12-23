@@ -47,7 +47,7 @@ public class UserService {
     }
 
     public Mono<User> getByUserName(String name) {
-        return userRepository.findByUserName(name);
+        return userRepository.findByUserName(name).map(user -> user.toBuilder().enabled(true).build());
     }
 
     public Mono<UserDto> create(UserDto dto) {

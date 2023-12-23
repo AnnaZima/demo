@@ -18,7 +18,8 @@ public class UserAuthenticationBearer {
         String username = claims.get("username", String.class);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
         Integer principalId = Integer.parseInt(subject);
-        CustomerPrincipal principal = new CustomerPrincipal();
+        CustomerPrincipal principal = new CustomerPrincipal(principalId, username);
+
 
         return Mono.justOrEmpty(new UsernamePasswordAuthenticationToken(principal, null, authorities));
     }

@@ -19,10 +19,11 @@ public class BearerTokenServerAuthenticationConverter implements ServerAuthentic
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        return extractHeader(exchange)
+        Mono<Authentication> authenticationMono = extractHeader(exchange)
                 .flatMap(getBearerValue)
                 .flatMap(jwtHandler::checkToken)
                 .flatMap(UserAuthenticationBearer::create);
+        return authenticationMono;
     }
 
     private Mono<String> extractHeader(ServerWebExchange exchan) {

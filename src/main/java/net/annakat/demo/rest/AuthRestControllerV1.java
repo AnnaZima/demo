@@ -8,10 +8,12 @@ import net.annakat.demo.mapper.UserMapper;
 import net.annakat.demo.model.User;
 import net.annakat.demo.security.CustomerPrincipal;
 import net.annakat.demo.security.SecurityService;
+import net.annakat.demo.security.TokenDetails;
 import net.annakat.demo.service.UserService;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -24,20 +26,16 @@ public class AuthRestControllerV1 {
     private final SecurityService service;
 
 
-//    @PostMapping(path = "/register", consumes = "application/json")
-//    public Mono<UserDto> register(@RequestBody UserDto dto) {
-//        User user = userMapper.map(dto);
-//        return userService.registerUser(user).map(userMapper::map);
-//    }
-//
-//    @PostMapping(path = "/register", consumes = "application/json")
-//    public Mono<UserDto> createUser(@RequestBody UserDto dto) {
-//        return userService.create(dto);
-//    }
+    @PostMapping(path = "/register", consumes = "application/json")
+    public Mono<UserDto> register(@RequestBody UserDto dto) {
+        User user = userMapper.map(dto);
+        return userService.registerUser(user).map(userMapper::map);
+    }
 
 
     @PostMapping("/login")
     public Mono<AuthResponseDto> login (@RequestBody AuthRequestDto requestDto) {
+
         return service.authenticate(requestDto.getUsername(), requestDto.getPassword())
                 .flatMap(tokenDetails -> Mono.just(AuthResponseDto.builder().userId(tokenDetails.getId())
                                 .token(tokenDetails.getToken())

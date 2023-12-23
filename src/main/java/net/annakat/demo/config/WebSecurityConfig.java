@@ -28,11 +28,13 @@ public class WebSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         ServerHttpSecurity serverHttpSecurity = http
+                .csrf().disable()
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS)
                         .permitAll()
                         .pathMatchers(publicRoutes)
                         .permitAll()
+                        .pathMatchers("/api/v1/users/**").permitAll()
                         .anyExchange()
                         .authenticated());
         serverHttpSecurity.exceptionHandling()
