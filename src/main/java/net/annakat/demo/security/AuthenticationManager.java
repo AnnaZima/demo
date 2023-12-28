@@ -18,10 +18,10 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         CustomerPrincipal customerPrincipal = (CustomerPrincipal) authentication.getPrincipal();
-        Mono<Authentication> map = userRepository.findById(customerPrincipal.getId())
+        return userRepository.findById(customerPrincipal.getId())
                 .filter(User::isEnabled)
                 .switchIfEmpty(Mono.error(new UnauthorizedException("")))
                 .map(user -> authentication);
-        return map;
+
     }
 }

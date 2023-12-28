@@ -38,18 +38,18 @@ public class SecurityService {
         return generateToken(claims, user.getId().toString());
     }
 
-    private TokenDetails generateToken(Map<String, Object> claims, String subject) {
+    private TokenDetails generateToken(Map<String, Object> claims, String id) {
         long expInMillis = expirationInSeconds * 1000L;
         long liveTime = Instant.now().toEpochMilli() + expInMillis;
-        return generateToken(Instant.ofEpochSecond(liveTime), claims, subject);
+        return generateToken(Instant.ofEpochSecond(liveTime), claims, id);
     }
 
-    private TokenDetails generateToken(Instant expirationsTime, Map<String, Object> claims, String subject) {
+    private TokenDetails generateToken(Instant expirationsTime, Map<String, Object> claims, String id) {
         Instant currentTime = Instant.now();
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuer(issuer)
-                .setSubject(subject)
+                .setSubject(id)
                 .setExpiration(Date.from(expirationsTime))
                 .setIssuedAt(Date.from(currentTime))
                 .setId(UUID.randomUUID().toString())

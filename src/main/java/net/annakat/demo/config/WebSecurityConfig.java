@@ -17,7 +17,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import reactor.core.publisher.Mono;
 
 @Configuration
-@EnableReactiveMethodSecurity(useAuthorizationManager=true)
+@EnableReactiveMethodSecurity(useAuthorizationManager = true)
 public class WebSecurityConfig {
 
     @Value("${jwt.secret}")
@@ -27,21 +27,24 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
-        ServerHttpSecurity serverHttpSecurity = http
+        return http
                 .csrf().disable()
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.OPTIONS)
-                        .permitAll()
-                        .pathMatchers(publicRoutes)
-                        .permitAll()
-                        .pathMatchers("/api/v1/users/**").permitAll()
-                        .anyExchange()
-                        .authenticated());
-        serverHttpSecurity.exceptionHandling()
+                .authorizeExchange()
+                .pathMatchers(HttpMethod.OPTIONS)
+                .permitAll()
+                .pathMatchers(publicRoutes)
+                .permitAll()
+                .anyExchange()
+                .authenticated()
+                .and()
+                .exceptionHandling()
                 .authenticationEntryPoint((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED)))
-                .accessDeniedHandler((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN))).and()
-                .addFilterAt(webFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION);
-       return serverHttpSecurity.build();
+                .accessDeniedHandler((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
+                .and()
+                .addFilterAt(webFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
+                .build();
+
+
     }
 
 
